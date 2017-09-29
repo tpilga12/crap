@@ -29,18 +29,20 @@ gain = 1;
 t = 0:0.1:50;
 
 
-[t,x] = ode45(@dx, t, [0; 0]);
+[t,x] = ode45(@xdot, t, [0.5; 0.5]);
 
 function dx=xdot(t,x)
-global  a b b_max c_max gain g h
-h = sin(2*pi*t);
-epsilon = 0.004;
-delta = (((h*cos(x(1)))/l_max)-b_max*x(2)-g*sin(x(1))-gain*x(2))/c_max;
-s=x(2)-gain*x(1);
-u=(delta+beta0)*sign(s);
+global  a b b_max c_max gain g h m l k
+h = sin(t);
+%epsilon = 0.004;
+%delta = (((h*cos(x(1)))/l_max)-b_max*x(2)-g*sin(x(1))-gain*x(2))/c_max;
+s=x(2)+gain*x(1);
+%u=(delta+beta0)*sign(s);
+u = -1*(16.1865*abs(x(1))+1.815*abs(x(2))+2)*sign(s);
 
 dx(1,1)= x(2); 
-dx(2,1)= x(2)-a*sin(x(1))-b*x(2)+c*u+h*cos(x(1));
+%dx(2,1)= x(2)-a*sin(x(1))-b*x(2)+c*u+h*cos(x(1));
+dx(2,1) = (1/(m*l))*(m*h*cos(x(1)) - k*l*x(2) - m*g*l*sin(x(1))) + (1/(m*l^2))*u;
 end
 
 
