@@ -29,7 +29,7 @@ function dx=xdot(t,x)
 global l m k g
     h = sin(2*pi*t);
     dx(1,1) = x(2);
-    dx(2,1) = (1/(m*l))*(m*h*cos(x(1)) - k*l*x(2) - m*g*l*sin(x(1))) + (1/(m*l^2));
+    dx(2,1) = (1/(m*l))*((m*h*cos(x(1)) - k*l*x(2) - m*g*l*sin(x(1)))) + (1/(m*l^2));
     
    
 end
