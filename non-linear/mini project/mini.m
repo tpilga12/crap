@@ -2,9 +2,9 @@ clc
 clear all
 
 %0.9 <= l <= 1.1   0.5 <= m <= 1.5   0 <= k <= 0.2    |h| <= 1
-global  l m k gain g epsilon
+global  l m k gain g epsilon u sat dummy
 g = 9.81;% m/s^2
-l_min = 0.9;, l_max = 1.1; % 
+l_min = 0.9;, l_max = 1.1; % length
 m_min = 0.5;, m_max = 1.5; % mass
 k_min = 0;, k_max = 0.2; % friction
 
@@ -12,17 +12,18 @@ l = l_min+(l_max-l_min)*rand;
 m = m_min+(m_max-m_min)*rand;
 k = k_min+(k_max-k_min)*rand;
 epsilon = 0.004;
-gain = 1;
-t = 0:0.001:100;
-
+gain = 1; % u=-(gain)*x1
+t = 0:0.1:100;
+dummy = 1;
 x0 = [5; 10]; % initial states
 [t,x] = ode45(@xdot, t, x0); % solve 
 
 for b = 1:length(x) 
 s1 = x(b,2)+gain*x(b,1);
-if s1 < -1
+sat1 = s1/epsilon;
+if sat1 < -1
     sat1 = -1;
-elseif s1 > 1
+elseif sat1 > 1
     sat1 = 1;
 else
     sat1 = s1/epsilon;
@@ -44,17 +45,18 @@ set(title1,'Interpreter','latex');
 subplot(2,3,2)
 plot(t,x(:,2))
 xlabel('Time [s]','FontSize',fontsize)
-ylabel('Angle velocity [\Theta dot]','FontSize',fontsize)
+ylabel('Angle velocity','FontSize',fontsize)
 title2 = title('$$\dot\theta$$');
 set(title2,'Interpreter','latex');
 
 subplot(2,3,3)
 plot(x(:,1),x(:,2))
 axis([-2 11 -11 11]);
-% xlabel = title('$$\theta$$');
-% set(xlabel,'Interpreter','latex');
-% ylabel = title('$$\dot\theta$$');
-% set(ylabel,'Interpreter','latex');
+title3 = title('s')
+%  xlabel = title('$$\theta$$');
+%  set(xlabel,'Interpreter','latex');
+%  ylabel = title('$$\dot\theta$$');
+%  set(ylabel,'Interpreter','latex');
 
 
 subplot(2,3,4)
@@ -63,7 +65,7 @@ hold on
 plot(xlim, [0.01 0.01], '-r')
 hold on
 plot(xlim, [-0.01 -0.01], '-r')
-axis([2 100 -0.1 0.1]);
+axis([2 100 -0.05 0.05]);
 xlabel('Time [s]','FontSize',fontsize)
 ylabel('Angle','FontSize',fontsize)
 title4 = title('$$\theta$$');
@@ -75,7 +77,7 @@ hold on
 plot(xlim, [0.01 0.01], '-r')
 hold on
 plot(xlim, [-0.01 -0.01], '-r')
-axis([2 100 -0.1 0.1]);
+axis([2 100 -0.05 0.05]);
 xlabel('Time [s]','FontSize',fontsize)
 ylabel('Angle velocity','FontSize',fontsize)
 title5 = title('$$\dot\theta$$');
@@ -89,22 +91,31 @@ title6 = title('u')
 
 
 function dx=xdot(t,x)
-global   gain g k m l epsilon
+global   gain g k m l epsilon u sat dummy
 
 h = cos(t); % Disturbance
 s = x(2)+gain*x(1);
-if s < -1
-    sat = -1;
-elseif s > 1
-    sat = 1;
+sat(dummy,1)=s/epsilon;
+if sat(dummy,1) < -1
+    sat(dummy,1) = -1;
+elseif sat(dummy,1) > 1
+    sat(dummy,1) = 1;
 else
-    sat = s/epsilon;
+    sat(dummy,1) = s/epsilon;
 end
 
-u = -(16.1865*abs(x(1))+1.815*abs(x(2)) +2)*sat;
+u(dummy,1) = -(16.1865*abs(x(1))+1.815*abs(x(2)) +2)*sat(dummy,1);
 dx(1,1)= x(2); 
-dx(2,1) = (1/(m*l))*((m*h*cos(x(1)) - k*l*x(2) - m*g*l*sin(x(1)))) + u*(1/(m*l^2));
+dx(2,1) = (1/(m*l))*((m*h*cos(x(1)) - k*l*x(2) - m*g*l*sin(x(1)))) + u(dummy,1)*(1/(m*l^2));
+dummy = dummy + 1;
 end
 
-
+%%
+% utest = u(1:(length(u)/length(x)):end)
+% sattest = sat(1:(length(sat)/length(x)):end)
+% %%
+% figure(2)
+% plot(t,sattest)
+% figure(3)
+% plot(t,utest)
 
