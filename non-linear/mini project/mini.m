@@ -2,7 +2,7 @@ clc
 clear all
 
 %0.9 <= l <= 1.1   0.5 <= m <= 1.5   0 <= k <= 0.2    |h| <= 1
-global  l m k gain g epsilon u sat dummy
+global  l m k gain g epsilon 
 g = 9.81;% m/s^2
 l_min = 0.9;, l_max = 1.1; % length
 m_min = 0.5;, m_max = 1.5; % mass
@@ -20,10 +20,10 @@ x0 = [5; 10]; % initial states
 
 for b = 1:length(x) 
 s1 = x(b,2)+gain*x(b,1);
-sat1 = s1/epsilon;
-if sat1 < -1
+
+if s1/epsilon < -1
     sat1 = -1;
-elseif sat1 > 1
+elseif s1/epsilon > 1
     sat1 = 1;
 else
     sat1 = s1/epsilon;
@@ -86,36 +86,24 @@ set(title5,'Interpreter','latex');
 subplot(2,3,6)
 plot(t,T)
 xlabel('Time [s]','FontSize',fontsize)
-ylabel('Control input [T]','FontSize',fontsize)
-title6 = title('u')
-
+ylabel('Control input','FontSize',fontsize)
+title6 = title('T')
 
 function dx=xdot(t,x)
-global   gain g k m l epsilon u sat dummy
+global   gain g k m l epsilon 
 
 h = cos(t); % Disturbance
 s = x(2)+gain*x(1);
-sat(dummy,1)=s/epsilon;
-if sat(dummy,1) < -1
-    sat(dummy,1) = -1;
-elseif sat(dummy,1) > 1
-    sat(dummy,1) = 1;
+sat=s/epsilon;
+if sat < -1
+    sat = -1;
+elseif sat > 1
+    sat = 1;
 else
-    sat(dummy,1) = s/epsilon;
+    sat = s/epsilon;
 end
 
-u(dummy,1) = -(16.1865*abs(x(1))+1.815*abs(x(2)) +2)*sat(dummy,1);
+u = -(16.1865*abs(x(1))+1.815*abs(x(2)) +2)*sat;
 dx(1,1)= x(2); 
-dx(2,1) = (1/(m*l))*((m*h*cos(x(1)) - k*l*x(2) - m*g*l*sin(x(1)))) + u(dummy,1)*(1/(m*l^2));
-dummy = dummy + 1;
+dx(2,1) = (1/(m*l))*((m*h*cos(x(1)) - k*l*x(2) - m*g*l*sin(x(1)))) + u*(1/(m*l^2));
 end
-
-%%
-% utest = u(1:(length(u)/length(x)):end)
-% sattest = sat(1:(length(sat)/length(x)):end)
-% %%
-% figure(2)
-% plot(t,sattest)
-% figure(3)
-% plot(t,utest)
-
