@@ -46,6 +46,24 @@ figure(4)
 plot(t,Input.Psuc,t,Input.Pdis)
 legend4 = legend('Compressor suction','Compressor discharge');
 
+%%
+
+figure(10)
+plot(t,Control.VecoPct,t,Control.VexpPct);
+
+figure(11)
+plot(t,Input.T0,t,Input.Tc,t,Input.Tc-Input.T0);
+legend11 = legend("T0","Tc","Tc-T0")
+C = -530;
+Gain = 235;
+
+VecoOD = ((Input.Tc-Input.T0).^2.*Gain - C)/1000000 .* Control.VexpPct;
+% T0 is the saturated suction temperature at the inlet of the compressor
+% Tc is the saturated discharge temperature at the outlet of the compressor
+VecoOD = (LimitSignal(VecoOD, [0 100]));
+figure(12)
+plot(t,VecoOD,t,Control.VecoPct);
+legend12 = legend("Calculated OD input econ","Measured OD input econ");
 
 
 

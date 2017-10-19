@@ -33,5 +33,5 @@ legend10 =legend('Calculated power','Measured power');
 
 %%
 err = immse(Freqconvert.Udc.*Freqconvert.Idc,Watt)/length(Watt)
-err2 = immse(power2,Watt)/length(Watt)
+%err2 = immse(power2,Watt)/length(Watt)
 
