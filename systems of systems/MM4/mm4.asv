@@ -14,24 +14,23 @@ A = [1 -1 -1  0  0  0  0  0;
 b = [0 0 0 0 1 2 3]';
 lambda_init = ones(1,7);
 lambda = lambda_init;
+rho = 0.001;
 f = @(x)alfa*[x(1) x(2) x(3) x(4) x(5) x(6) x(7) x(8)]';
 x(:,1) = [1 1 1 1 1 1 1 1];
-rho = 0.001;
+
 k = 1;
-epsilon = 0.01;
+epsilon = 0.2;
 compare = 10;
 while compare > epsilon    
-%lagrangian augmented form
 fun = @(x)alfa*[x(1) x(2) x(3) x(4) x(5) x(6) x(7) x(8)]' + lambda*(A*[x(1) x(2) x(3) x(4) x(5) x(6) x(7) x(8)]' - b);
-
-xout(:,k) = x; 
-x = fmincon(fun,x,-eye(8),zeros(8,1)); % calculate/find primal value x*
+xout(:,k) = x;
+x = fmincon(fun,x,-eye(8),zeros(8,1));
 
 
 lambdaout(:,k) = lambda';
 lambda = lambda + rho*(A*x-b)';
 
-compare = norm(fun(x) -f(x)) % limit
+compare = norm(fun(x) -f(x)); % limit
 compareout(k) = compare;
 k = k+1;
 
