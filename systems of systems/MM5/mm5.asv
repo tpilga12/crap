@@ -47,12 +47,12 @@ dV = 2 ;
 % Define the unknown Lyapunov function
 [V,cV] = polynomial(x,dV);
 % Define the vector  f i e l d
-% f = -x^3 ;
-f = [ -x1+0.5*x2-x1^3; 0.5*x1-2*x2-x2^3];
+f = -x^3 ;
+% f = [ -x1+0.5*x2-x1^3; 0.5*x1-2*x2-x2^3];
 % Specify Lyapunov conditions
 con = [sos(V); sos(-jacobian(V,x)*f)];
 options = sdpsettings('solver','mosek') ;
-optimize(con,1,options,[cV]);
+optimize(con,1,options,[cV]) ;
 % Get c o e f f i c i e n t s  of the Lyapunov function
 cV  =  double(cV);
 X  =  sdpvar(1,1);
